@@ -190,3 +190,66 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         msg = await message.reply(REPLY_ERROR)
         await asyncio.sleep(8)
         await msg.delete()
+
+#admins 
+
+@Bot.on_message(filters.command("add_admin") & filters.user(OWNER_ID))
+async def add_admin_command(client, message):
+    if len(message.command) != 2:
+        await message.reply("Usage: /add_admin <user_id>")
+        return
+
+    try:
+        user_id = int(message.command[1])  # Ensure user_id is an integer
+    except ValueError:
+        await message.reply("Invalid user ID. Please provide a numeric user ID.")
+        return
+
+    try:
+        # Check if the user is already an admin
+        admin_check = await admins_collection.find_one({"_id": user_id})
+        if admin_check:
+            await message.reply("This user is already an admin.")
+            return
+
+        # Add the user as an admin
+        await admins_collection.insert_one({"_id": user_id})
+        await message.reply(f"User {user_id} has been added as an admin.")
+
+        # Notify the new admin
+        await client.send_message(
+            chat_id=user_id,
+            text="**Congratulations! You have been upgraded to Admin.**",
+            parse_mode="markdown"
+        )
+    except Exception as e:
+        # Handle unexpected errors
+        await message.reply(f"An error occurred: {str(e)}")
+
+
+@Bot.on_message(filters.command("remove_admin") & filters.user(OWNER_ID))
+async def remove_admin_command(client, message):
+    if len(message.command) != 2:
+        await message.reply("Usage: /remove_admin <user_id>")
+        return
+
+    try:
+        user_id = int(message.command[1])
+    except ValueError:
+        await message.reply("Invalid user ID. Please provide a numeric user ID.")
+        return
+
+    if remove_admin(user_id):
+        await message.reply(f"User {user_id} has been removed from the admin list.")
+    else:
+        await message.reply("This user is not an admin.")
+
+
+@Bot.on_message(filters.command("list_admins") & filters.user(OWNER_ID))
+async def list_admins_command(client, message):
+    admin_ids = list_admins()
+    admin_ids.extend(ADMINS)  # Include static ADMINS from config
+    admin_list = "\n".join(map(str, set(admin_ids)))
+    await message.reply(f"Current admins:\n{admin_list}")
+
+#Don't remove This Line From Here. Tg: @rohit_1888 | @Javpostr
