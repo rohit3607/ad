@@ -4,10 +4,11 @@ from pyrogram import filters
 from config import ADMINS, BOT_STATS_TEXT, USER_REPLY_TEXT
 from datetime import datetime
 from helper_func import get_readable_time
-from database.database import *
+from database.database import admins_collection  # Ensure this is the correct import
 
-# Combine ADMINS from config and admin_collection
-combined_admins = set(ADMINS) | set(admins_collection)  # Using set to avoid duplicates
+# Fetch admin IDs from the database
+db_admins = [admin['id'] for admin in admins_collection.find({}, {"_id": 0, "id": 1})]  # Replace "id" with the correct field
+combined_admins = set(ADMINS) | set(db_admins)  # Using set to avoid duplicates
 
 
 @Bot.on_message(filters.command('stats') & filters.user(combined_admins))
