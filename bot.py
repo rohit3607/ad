@@ -7,12 +7,8 @@ from pyrogram.enums import ParseMode
 import sys
 from datetime import datetime
 
-from config import API_HASH, APP_ID, LOGGER, TG_BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, CHANNEL_ID, LOG_CHANNEL, PORT
+from config import API_HASH, APP_ID, LOGGER, TG_BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, CHANNEL_ID, PORT
 
-
-name ="""
- CODEFLEX 
-"""
 
 
 class Bot(Client):
@@ -73,9 +69,6 @@ class Bot(Client):
 
         self.set_parse_mode(ParseMode.HTML)
 
-        # Send a restart message to the LOG_CHANNEL
-        if LOG_CHANNEL:
-            await self.send_message(chat_id=LOG_CHANNEL, text="Bᴏᴛ Rᴇsᴛᴀʀᴛᴇᴅ !")
 
         self.LOGGER(__name__).info(f"Bot Running..!\n\nCreated by \nhttps://t.me/weebs_support")
         self.LOGGER(__name__).info("BOT SUCCESSFULLY DEPLOYED")
