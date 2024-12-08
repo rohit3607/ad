@@ -12,7 +12,7 @@ database = dbclient[DB_NAME]
 
 
 user_data = database['users']
-
+admins_collection = database['admins']  # Collection to store admin IDs
 
 
 async def present_user(user_id : int):
