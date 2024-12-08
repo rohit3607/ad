@@ -10,7 +10,7 @@ from helper_func import get_readable_time
 combined_admins = set(ADMINS) | set(admins_collection)  # Using set to avoid duplicates
 
 
-@Bot.on_message(filters.command('stats') & filters.user(ADMINS))
+@Bot.on_message(filters.command('stats') & filters.user(combined_admins))
 async def stats(bot: Bot, message: Message):
     now = datetime.now()
     delta = now - bot.uptime
