@@ -10,6 +10,14 @@ from config import *
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import *
 
+async def is_admin(user_id):
+    # Check if the user is in the static ADMINS list
+    if user_id in ADMINS:
+        return True
+    # Check if the user is in the database collection
+    admin_check = await admins_collection.find_one({"_id": user_id})
+    return admin_check is not None
+
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -192,8 +200,7 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         await msg.delete()
 
 #admins 
-
-@Bot.on_message(filters.command("add_admin") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("add_admin") & filters.private & filters.user(is_admin))
 async def add_admin_command(client, message):
     if len(message.command) != 2:
         await message.reply("Usage: /add_admin <user_id>")
@@ -214,7 +221,7 @@ async def add_admin_command(client, message):
 
         # Add the user as an admin
         await admins_collection.insert_one({"_id": user_id})
-        await message.reply(f"User {user_id} has been added as an admin.")
+        await message.reply(f"User  {user_id} has been added as an admin.")
 
         # Notify the new admin
         await client.send_message(
@@ -223,26 +230,33 @@ async def add_admin_command(client, message):
             parse_mode="markdown"
         )
     except Exception as e:
-        # Handle unexpected errors
         await message.reply(f"An error occurred: {str(e)}")
 
-
-@Bot.on_message(filters.command("remove_admin") & filters.user(OWNER_ID))
+@Bot.on_message(filters.command("remove_admin") & filters.private & filters.user(is_admin))
 async def remove_admin_command(client, message):
     if len(message.command) != 2:
         await message.reply("Usage: /remove_admin <user_id>")
         return
 
     try:
-        user_id = int(message.command[1])
+        user_id = int(message.command[1])  # Ensure user_id is an integer
     except ValueError:
         await message.reply("Invalid user ID. Please provide a numeric user ID.")
         return
 
-    if remove_admin(user_id):
-        await message.reply(f"User {user_id} has been removed from the admin list.")
-    else:
-        await message.reply("This user is not an admin.")
+    try:
+        # Check if the user is an admin
+        admin_check = await admins_collection.find_one({"_id": user_id})
+        if not admin_check:
+            await message.reply("This user is not an admin.")
+            return
+
+        # Remove the user as an admin
+        await admins_collection.delete_one({"_id": user_id})
+        await message.reply(f"User  {user_id} has been removed from admin.")
+
+    except Exception as e:
+        await message.reply(f"An error occurred: {str(e)}")
 
 
 @Bot.on_message(filters.command("list_admins") & filters.user(OWNER_ID))
