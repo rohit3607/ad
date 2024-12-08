@@ -7,7 +7,7 @@ from helper_func import get_readable_time
 
 
 # Combine ADMINS from config and admin_collection
-combined_admins = set(ADMINS) | set(admin_collection)  # Using set to avoid duplicates
+combined_admins = set(ADMINS) | set(admins_collection)  # Using set to avoid duplicates
 
 
 @Bot.on_message(filters.command('stats') & filters.user(ADMINS))
