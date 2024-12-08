@@ -5,6 +5,11 @@ from config import ADMINS, BOT_STATS_TEXT, USER_REPLY_TEXT
 from datetime import datetime
 from helper_func import get_readable_time
 
+
+# Combine ADMINS from config and admin_collection
+combined_admins = set(ADMINS) | set(admin_collection)  # Using set to avoid duplicates
+
+
 @Bot.on_message(filters.command('stats') & filters.user(ADMINS))
 async def stats(bot: Bot, message: Message):
     now = datetime.now()
