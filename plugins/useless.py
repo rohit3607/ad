@@ -18,7 +18,13 @@ async def stats(bot: Bot, message: Message):
     await message.reply(BOT_STATS_TEXT.format(uptime=time))
 
 
-@Bot.on_message(filters.private & filters.incoming)
-async def useless(_,message: Message):
+@Bot.on_message(filters.private)
+async def useless(_, message: Message):
+    user_id = message.from_user.id
+
+    # Check if the user is in the combined admin list
+    if user_id in combined_admins:
+        return  # Do not send USER_REPLY_TEXT to admins
+
     if USER_REPLY_TEXT:
         await message.reply(USER_REPLY_TEXT)
