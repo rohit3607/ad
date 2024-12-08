@@ -8,7 +8,7 @@ from database.database import admins_collection  # Ensure this is the correct im
 
 # Fetch admin IDs from the database
 db_admins = [admin['id'] for admin in admins_collection.find({}, {"_id": 0, "id": 1})]  # Replace "id" with the correct field
-combined_admins = set(ADMINS) | set(db_admins)  # Using set to avoid duplicates
+combined_admins = list(set(ADMINS) | set(db_admins))  # Convert to list to ensure compatibility
 
 
 @Bot.on_message(filters.command('stats') & filters.user(combined_admins))
