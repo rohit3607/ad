@@ -4,7 +4,7 @@ from pyrogram import filters
 from config import ADMINS, BOT_STATS_TEXT, USER_REPLY_TEXT
 from datetime import datetime
 from helper_func import get_readable_time
-
+from database.database import *
 
 # Combine ADMINS from config and admin_collection
 combined_admins = set(ADMINS) | set(admins_collection)  # Using set to avoid duplicates
