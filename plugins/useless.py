@@ -4,12 +4,19 @@ from pyrogram import filters
 from config import ADMINS, BOT_STATS_TEXT, USER_REPLY_TEXT
 from datetime import datetime
 from helper_func import get_readable_time
-from database.database import admins_collection  # Ensure this is the correct import
+from database.database import admins_collection  
 
-# Fetch admin IDs from the database
-db_admins = [admin['id'] for admin in admins_collection.find({}, {"_id": 0, "id": 1})]  # Replace "id" with the correct field
-combined_admins = list(set(ADMINS) | set(db_admins))  # Convert to list to ensure compatibility
+db_admins = [admin['id'] for admin in admins_collection.find({}, {"_id": 0, "id": 1})]  
+combined_admins = list(set(ADMINS) | set(db_admins))  
 
+bot.uptime = datetime.now()
+
+def get_readable_time(seconds):
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}h {minutes}m {seconds}s"
+
+BOT_STATS_TEXT = "Bot uptime: {uptime}"
 
 @Bot.on_message(filters.command('stats') & filters.user(combined_admins))
 async def stats(bot: Bot, message: Message):
@@ -17,7 +24,6 @@ async def stats(bot: Bot, message: Message):
     delta = now - bot.uptime
     time = get_readable_time(delta.seconds)
     await message.reply(BOT_STATS_TEXT.format(uptime=time))
-
 
 @Bot.on_message(filters.private)
 async def useless(_, message: Message):
